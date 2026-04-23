@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Noble Water — The Taste of Prestige</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<meta http-equiv="Cache-Control" content="max-age=31536000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0A1628;--blue:#1A4B8C;--sky:#3A9BD5;--ice:#D6EEF8;
+  --accent:#2FBF71;--white:#FFFFFF;--offwhite:#F5F9FC;
+  --text:#0A1628;--muted:#5A7080;--border:rgba(10,22,40,0.12);
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--white);color:var(--text);overflow-x:hidden}
+
+/* ── EDIT MODE ── */
+.edit-bar{
+  position:fixed;bottom:0;left:0;right:0;z-index:999;
+  background:var(--navy);color:white;
+  display:flex;align-items:center;justify-content:center;gap:1rem;
+  padding:0.6rem 1.5rem;font-size:0.85rem;
+  transform:translateY(100%);transition:transform 0.3s;
+}
+.edit-bar.visible{transform:translateY(0)}
+.edit-bar button{
+  background:var(--accent);color:white;border:none;border-radius:100px;
+  padding:0.4rem 1.1rem;font-size:0.8rem;font-family:'DM Sans',sans-serif;cursor:pointer;
+}
+.edit-bar .cancel-btn{background:transparent;border:1px solid rgba(255,255,255,0.3)}
+[contenteditable="true"]{
+  outline:2px dashed rgba(47,191,113,0.7);outline-offset:3px;
+  border-radius:4px;cursor:text;min-width:20px;display:inline-block;
+}
+[contenteditable="true"]:focus{outline:2px solid #2FBF71;background:rgba(47,191,113,0.06)}
+#edit-fab{
+  position:fixed;bottom:1.5rem;right:1.5rem;z-index:998;
+  background:var(--navy);color:white;border:none;border-radius:100px;
+  padding:0.65rem 1.3rem;font-size:0.85rem;font-family:'DM Sans',sans-serif;
+  font-weight:500;cursor:pointer;box-shadow:0 4px 20px rgba(10,22,40,0.3);
+  display:flex;align-items:center;gap:0.5rem;transition:background 0.2s;
+}
+#edit-fab:hover{background:var(--blue)}
+#edit-fab svg{width:16px;height:16px}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1rem 3rem;background:rgba(255,255,255,0.92);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--border);
+}
+.nav-logo{
+  display:flex;align-items:center;gap:0.6rem;
+  font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;
+  color:var(--navy);text-decoration:none;
+}
+.logo-upload-btn{
+  font-size:0.7rem;font-family:'DM Sans',sans-serif;font-weight:400;color:var(--sky);
+  border:1px dashed var(--sky);border-radius:4px;padding:2px 8px;cursor:pointer;
+  margin-left:6px;background:transparent;transition:background 0.2s;
+}
+.logo-upload-btn:hover{background:var(--ice)}
+#logo-file{display:none}
+#nav-logo-img{display:none;width:36px;height:36px;border-radius:50%;object-fit:contain}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{font-size:0.9rem;color:var(--muted);text-decoration:none;font-weight:400;transition:color 0.2s}
+.nav-links a:hover{color:var(--navy)}
+.nav-cta{
+  background:#25D366;color:var(--white);border:none;border-radius:100px;
+  padding:0.55rem 1.4rem;font-size:0.88rem;font-family:'DM Sans',sans-serif;
+  font-weight:500;cursor:pointer;transition:background 0.2s;text-decoration:none;
+  display:inline-flex;align-items:center;gap:0.4rem;
+}
+.nav-cta:hover{background:#1ebe5d}
+
+/* ── HERO ── */
+.hero{
+  min-height:100vh;
+  background-image:url('hero-bg.jpg');
+  background-size:cover;background-position:center top;
+  display:grid;grid-template-columns:1fr 1fr;
+  align-items:center;padding:6rem 5rem 4rem;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(160deg,rgba(10,22,40,0.83) 0%,rgba(26,75,140,0.65) 55%,rgba(10,22,40,0.4) 100%);
+  pointer-events:none;
+}
+.water-rings{
+  position:absolute;right:5%;top:50%;transform:translateY(-50%);
+  width:520px;height:520px;pointer-events:none;
+}
+.ring{
+  position:absolute;border-radius:50%;border:1px solid rgba(255,255,255,0.12);
+  top:50%;left:50%;transform:translate(-50%,-50%);
+  animation:pulse 4s ease-in-out infinite;
+}
+.ring:nth-child(1){width:260px;height:260px;animation-delay:0s}
+.ring:nth-child(2){width:360px;height:360px;animation-delay:.8s}
+.ring:nth-child(3){width:460px;height:460px;animation-delay:1.6s}
+@keyframes pulse{
+  0%,100%{opacity:.15;transform:translate(-50%,-50%) scale(1)}
+  50%{opacity:.35;transform:translate(-50%,-50%) scale(1.04)}
+}
+.hero-text{position:relative;z-index:2}
+.hero-badge{
+  display:inline-block;background:rgba(255,255,255,0.15);color:#A8D8F0;
+  border-radius:100px;padding:.35rem 1rem;font-size:.8rem;font-weight:500;
+  letter-spacing:.08em;text-transform:uppercase;margin-bottom:1.5rem;
+  border:1px solid rgba(255,255,255,0.2);
+}
+.hero h1{
+  font-family:'Playfair Display',serif;font-size:clamp(2.8rem,5vw,4.5rem);
+  font-weight:900;color:var(--white);line-height:1.08;margin-bottom:1.4rem;
+}
+.hero h1 span{color:#5DCEF0}
+.hero-sub{
+  font-size:1.05rem;color:rgba(255,255,255,0.84);font-weight:300;
+  line-height:1.7;max-width:440px;margin-bottom:2.5rem;
+}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap}
+.btn-primary{
+  background:var(--accent);color:var(--white);border:none;border-radius:100px;
+  padding:.85rem 2rem;font-size:.95rem;font-family:'DM Sans',sans-serif;
+  font-weight:500;cursor:pointer;transition:transform .15s,background .2s;
+  text-decoration:none;display:inline-flex;align-items:center;
+}
+.btn-primary:hover{background:#28a862;transform:translateY(-1px)}
+.btn-ghost{
+  background:transparent;color:var(--white);
+  border:1.5px solid rgba(255,255,255,0.4);border-radius:100px;
+  padding:.85rem 2rem;font-size:.95rem;font-family:'DM Sans',sans-serif;
+  font-weight:400;cursor:pointer;transition:border-color .2s,background .2s;
+  text-decoration:none;display:inline-flex;align-items:center;
+}
+.btn-ghost:hover{border-color:white;background:rgba(255,255,255,.08)}
+.hero-visual{display:flex;justify-content:center;align-items:center;position:relative;z-index:2}
+.bottle-svg-wrap{filter:drop-shadow(0 30px 60px rgba(0,0,0,.5));animation:float 5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-16px)}}
+.hero-stats{
+  grid-column:1/-1;display:flex;gap:3rem;
+  border-top:1px solid rgba(255,255,255,.12);
+  padding-top:2.5rem;margin-top:2rem;
+}
+.stat-item{color:white}
+.stat-num{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700}
+.stat-label{font-size:.82rem;color:rgba(255,255,255,.55);font-weight:300;margin-top:2px}
+
+/* ── PH STRIP ── */
+.ph-strip{
+  background:var(--ice);display:flex;align-items:center;
+  justify-content:center;gap:4rem;padding:2.5rem 3rem;flex-wrap:wrap;
+}
+.ph-item{text-align:center}
+.ph-num{font-family:'Playfair Display',serif;font-size:2rem;font-weight:700;color:var(--blue)}
+.ph-label{font-size:.82rem;color:var(--muted);font-weight:400;letter-spacing:.05em}
+
+/* ── SECTIONS ── */
+.section{padding:6rem 5rem}
+.section-tag{font-size:.78rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--sky);margin-bottom:.8rem}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(2rem,3.5vw,3rem);font-weight:700;color:var(--navy);margin-bottom:1rem}
+.section-sub{font-size:1rem;color:var(--muted);font-weight:300;max-width:520px;line-height:1.7}
+
+/* ── PRODUCTS ── */
+.products-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.5rem;margin-top:3.5rem}
+.product-card{
+  background:var(--offwhite);border:1px solid var(--border);border-radius:20px;
+  padding:2rem 1.5rem 1.5rem;text-align:center;
+  transition:transform .25s,box-shadow .25s;cursor:pointer;position:relative;overflow:hidden;
+}
+.product-card::before{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:4px;
+  background:linear-gradient(90deg,var(--sky),var(--accent));
+  transform:scaleX(0);transform-origin:left;transition:transform .3s;
+}
+.product-card:hover{transform:translateY(-6px);box-shadow:0 20px 50px rgba(26,75,140,.1)}
+.product-card:hover::before{transform:scaleX(1)}
+.product-card.featured{background:var(--navy);color:white;border-color:var(--navy)}
+.product-card.featured .prod-name,.product-card.featured .prod-vol{color:white}
+.product-card.featured .prod-desc{color:rgba(255,255,255,.65)}
+.featured-badge{
+  position:absolute;top:12px;right:12px;background:var(--accent);color:white;
+  font-size:.65rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;
+  padding:3px 8px;border-radius:100px;
+}
+.prod-icon{margin:0 auto 1.2rem;display:block}
+.prod-vol{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--navy);margin-bottom:.3rem}
+.prod-name{font-size:.82rem;font-weight:500;color:var(--blue);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.6rem}
+.prod-desc{font-size:.82rem;color:var(--muted);font-weight:300;line-height:1.5}
+
+/* ── FEATURES ── */
+.features-bg{background:var(--offwhite)}
+.features-layout{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;margin-top:3rem}
+.features-list{display:flex;flex-direction:column;gap:1.8rem;margin-top:1rem}
+.feat-item{display:flex;gap:1.2rem;align-items:flex-start}
+.feat-icon{width:44px;height:44px;flex-shrink:0;background:var(--ice);border-radius:12px;display:flex;align-items:center;justify-content:center}
+.feat-icon svg{width:22px;height:22px}
+.feat-title{font-size:.95rem;font-weight:500;color:var(--navy);margin-bottom:3px}
+.feat-body{font-size:.85rem;color:var(--muted);line-height:1.6;font-weight:300}
+.features-visual{position:relative;display:flex;justify-content:center;align-items:center}
+.big-bottle{filter:drop-shadow(0 20px 40px rgba(26,75,140,.18))}
+
+/* ── DELIVERY ── */
+.delivery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:2rem;margin-top:3.5rem}
+.delivery-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:2rem}
+.d-icon{width:48px;height:48px;background:var(--navy);border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:1.2rem}
+.d-title{font-size:1rem;font-weight:500;color:var(--navy);margin-bottom:.4rem}
+.d-body{font-size:.85rem;color:var(--muted);font-weight:300;line-height:1.6}
+
+/* ── CONTACT ── */
+.contact-section{
+  background:linear-gradient(135deg,var(--navy) 0%,var(--blue) 100%);
+  padding:6rem 5rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start;
+}
+.contact-section .section-title{color:white}
+.contact-section .section-sub{color:rgba(255,255,255,.65)}
+.contact-form{display:flex;flex-direction:column;gap:1rem}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.form-group{display:flex;flex-direction:column;gap:.4rem}
+.form-group label{font-size:.8rem;color:rgba(255,255,255,.7);font-weight:400}
+.form-group input,.form-group select,.form-group textarea{
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
+  border-radius:10px;padding:.75rem 1rem;color:white;font-size:.9rem;
+  font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;
+}
+.form-group input::placeholder,.form-group textarea::placeholder{color:rgba(255,255,255,.35)}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:rgba(255,255,255,.5)}
+.form-group select option{color:var(--navy);background:white}
+.form-group textarea{resize:vertical;min-height:100px}
+.submit-btn{
+  background:#25D366;color:white;border:none;border-radius:100px;
+  padding:.9rem 2.2rem;font-size:.95rem;font-family:'DM Sans',sans-serif;
+  font-weight:500;cursor:pointer;align-self:flex-start;
+  transition:background .2s,transform .15s;margin-top:.5rem;
+  display:inline-flex;align-items:center;gap:.5rem;
+}
+.submit-btn:hover{background:#1ebe5d;transform:translateY(-1px)}
+
+footer{
+  background:var(--navy);color:rgba(255,255,255,.5);text-align:center;
+  padding:2rem 3rem;font-size:.82rem;font-weight:300;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+footer strong{color:white;font-weight:500}
+
+@media(max-width:900px){
+  nav{padding:1rem 1.5rem}
+  .nav-links{display:none}
+  .hero{grid-template-columns:1fr;padding:6rem 2rem 3rem}
+  .hero-visual{display:none}
+  .hero-stats{gap:1.5rem;flex-wrap:wrap}
+  .section{padding:4rem 1.5rem}
+  .features-layout{grid-template-columns:1fr}
+  .features-visual{display:none}
+  .contact-section{grid-template-columns:1fr;padding:4rem 1.5rem}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+  <img src="NOBLE WATER LOGO.png" alt="Noble Water Logo" style="width:60px; height:60px; border-radius:50%; object-fit:cover;">
+      <path d="M18 4C18 4 6 17 6 23.5A12 12 0 0 0 30 23.5C30 17 18 4 18 4Z" fill="url(#dg)"/>
+      <defs><linearGradient id="dg" x1="6" y1="14" x2="30" y2="32" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#3A9BD5"/><stop offset="100%" stop-color="#1A4B8C"/></linearGradient></defs>
+    </svg>
+    <span id="brand-name">Noble Water</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#products">Products</a></li>
+    <li><a href="#features">Why Noble</a></li>
+    <li><a href="#delivery">Delivery</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a class="nav-cta" href="https://wa.me/26656910125?text=Hi%20Noble%20Water!%20I%20would%20like%20to%20place%20an%20order." target="_blank">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+    Order Now
+  </a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-text">
+    <div class="hero-badge" id="hero-badge">pH 7.5 · Prepared Mineral Water · Lesotho</div>
+    <h1>The Taste of<br/><span id="hero-tagline">Prestige</span></h1>
+    <p class="hero-sub" id="hero-sub">Noble Water delivers ultra-purified, pH-balanced mineral water in every size — from on-the-go sachets to bulk containers. Clean. Fresh. Noble.</p>
+    <div class="hero-btns">
+      <a class="btn-primary" href="#products">View Products</a>
+      <a class="btn-ghost" href="https://wa.me/26656910125?text=Hi%20Noble%20Water!%20I%27d%20like%20a%20quote." target="_blank">Get a Quote on WhatsApp</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="water-rings"><div class="ring"></div><div class="ring"></div><div class="ring"></div></div>
+    <div class="bottle-svg-wrap"> <img src="floating.png" alt="Floating" style="width: 400px; height: 550px; object-fit: cover;">
+    </div>
+</div>
+        <rect x="82" y="10" width="56" height="30" rx="8" fill="#2196C9"/>
+        <rect x="88" y="40" width="44" height="10" rx="4" fill="#1A4B8C"/>
+        <path d="M72 55 Q65 75 62 100 L55 340 Q54 360 110 365 Q166 360 165 340 L158 100 Q155 75 148 55 Z" fill="url(#bG)"/>
+        <path d="M64 180 Q110 175 156 180 L158 100 Q155 75 148 55 L72 55 Q65 75 62 100 Z" fill="url(#wG)" opacity="0.6"/>
+        <rect x="62" y="200" width="96" height="120" rx="8" fill="white" opacity="0.92"/>
+        <path d="M90 215C90 215 84 222 84 225.5A6 6 0 0 0 96 225.5C96 222 90 215 90 215Z" fill="#3A9BD5"/>
+        <circle cx="75" cy="140" r="3" fill="white" opacity="0.3"/>
+        <circle cx="82" cy="120" r="2" fill="white" opacity="0.25"/>
+        <circle cx="145" cy="135" r="3" fill="white" opacity="0.3"/>
+        <ellipse cx="110" cy="362" rx="55" ry="8" fill="rgba(0,0,0,0.12)"/>
+        <defs>
+          <linearGradient id="bG" x1="55" y1="55" x2="165" y2="365" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="rgba(200,235,255,0.85)"/><stop offset="100%" stop-color="rgba(120,190,230,0.6)"/></linearGradient>
+          <linearGradient id="wG" x1="55" y1="55" x2="165" y2="180" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="rgba(58,155,213,0.4)"/><stop offset="100%" stop-color="rgba(26,75,140,0.6)"/></linearGradient>
+        </defs>
+    </div>
+  </div>
+  <div class="hero-stats" style="color: white; position: relative; z-index: 10;">
+    <div class="stat-item"><div class="stat-num" id="stat1-num">pH 7.5</div><div class="stat-label" id="stat1-lbl">Balanced Alkalinity</div></div>
+    <div class="stat-item"><div class="stat-num" id="stat2-num">5+</div><div class="stat-label" id="stat2-lbl">Product Sizes</div></div>
+    <div class="stat-item"><div class="stat-num" id="stat3-num">99.9%</div><div class="stat-label" id="stat3-lbl">Purified Water</div></div>
+    <div class="stat-item"><div class="stat-num" id="stat4-num">Free</div><div class="stat-label" id="stat4-lbl">Local Delivery</div></div>
+</section>
+
+<!-- PH STRIP -->
+<div class="ph-strip">
+  <div class="ph-item"><div class="ph-num" id="ph1-num">pH 7.5</div><div class="ph-label" id="ph1-lbl">Alkaline Balanced</div></div>
+  <div class="ph-item"><div class="ph-num" id="ph2-num">0 PPM</div><div class="ph-label" id="ph2-lbl">Heavy Metals</div></div>
+  <div class="ph-item"><div class="ph-num" id="ph3-num">Multi-Stage</div><div class="ph-label" id="ph3-lbl">Purification Process</div></div>
+  <div class="ph-item"><div class="ph-num" id="ph4-num">Lesotho</div><div class="ph-label" id="ph4-lbl">Proudly Local</div></div>
+
+</div>
+
+<!-- PRODUCTS -->
+<section class="section" id="products">
+  <div class="section-tag">Our Range</div>
+  <div class="section-title" id="prod-title">Every Size, Every Need</div>
+  <p class="section-sub" id="prod-sub">From convenient sachets to bulk containers — Noble Water keeps you and your business hydrated.</p>
+  <div class="products-grid">
+    <div class="product-card">
+      <img class="prod-icon" src="satchet.webp" alt="Noble Water Bottle" width="200" height="350" loading="lazy" decoding="async">
+      <div class="prod-vol" id="p0-vol">Sachet</div><div class="prod-name" id="p0-name">Water Sachet</div>
+      <p class="prod-desc" id="p0-desc">Pure purified water sachets — ideal for everyday hydration on the go.</p>
+    </div>
+    <div class="product-card">
+      <img class="prod-icon" src="350 ml.png" alt="Noble Water Bottle" width="180" height="350">
+      <div class="prod-vol" id="p1-vol">350 ml</div><div class="prod-name" id="p1-name">Mini Bottle</div>
+      <p class="prod-desc" id="p1-desc">Perfect pocket-sized bottle for school, gym & quick refreshment.</p>
+    </div>
+    <div class="product-card featured">
+      <div class="featured-badge">Best Seller</div>
+      <img class="prod-icon" src="floating.webp" alt="Noble Water Bottle" width="180" height="350" >
+      <div class="prod-vol" id="p2-vol">500 ml</div><div class="prod-name" id="p2-name">Standard Bottle</div>
+      <p class="prod-desc" id="p2-desc">Our most popular size — the everyday companion for pure hydration.</p>
+    </div>
+    <div class="product-card">
+      <img class="prod-icon" src="1.5 liter.png" alt="Noble Water Bottle" width="180" height="350">
+      <div class="prod-vol" id="p3-vol">1.5 L</div><div class="prod-name" id="p3-name">Family Bottle</div>
+      <p class="prod-desc" id="p3-desc">Great for households, restaurants, and sharing around the table.</p>
+    </div>
+    <div class="product-card">
+      <img class="prod-icon" src="5 liter.png" alt="Noble Water Bottle" width="250" height="350">
+      <div class="prod-vol" id="p4-vol">5 L</div><div class="prod-name" id="p4-name">Bulk Container</div>
+      <p class="prod-desc" id="p4-desc">Office, events, and home use — bulk pure water at your convenience.</p>
+    </div>
+    <div class="product-card">
+      <img class="prod-icon" src="10 liter bottle.png" alt="Noble Water Bottle" width="250" height="350">
+      <div class="prod-vol" id="p5-vol">10 L</div><div class="prod-name" id="p5-name">XL Container</div>
+      <p class="prod-desc" id="p5-desc">The ultimate bulk option for large offices, construction, and events.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section features-bg" id="features">
+  <div class="section-tag">Why Noble Water</div>
+  <div class="section-title" id="feat-title">Purity You Can Trust</div>
+  <div class="features-layout">
+    <div>
+      <p class="section-sub" id="feat-sub">Every drop of Noble Water goes through a Meticulous multi-stage purification process to deliver safe, great-tasting water.</p>
+      <div class="features-list">
+        <div class="feat-item"><div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#3A9BD5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C12 2 3 10 3 15.5A9 9 0 0 0 21 15.5C21 10 12 2 12 2Z"/></svg></div><div><div class="feat-title" id="f1-title">Multi-Stage Purification</div><div class="feat-body" id="f1-body">Filtered through reverse osmosis, UV treatment, and mineral balancing for the purest possible water.</div></div></div>
+        <div class="feat-item"><div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#3A9BD5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg></div><div><div class="feat-title" id="f2-title">pH 7.5 Balanced</div><div class="feat-body" id="f2-body">Perfectly balanced alkaline water supports hydration, digestion, and everyday wellness.</div></div></div>
+        <div class="feat-item"><div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#3A9BD5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></div><div><div class="feat-title" id="f3-title">Custom Branded Bottles</div><div class="feat-body" id="f3-body">Brand your bottles with your logo for events, hotels, restaurants and corporate gifting.</div></div></div>
+        <div class="feat-item"><div class="feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#3A9BD5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div><div><div class="feat-title" id="f4-title">Free Local Delivery</div><div class="feat-body" id="f4-body">We deliver right to your door — no added cost, no hassle. Available across Maseru and surrounding areas.</div></div></div>
+      </div>
+    </div>
+    <div class="features-visual">
+      <img class= "feature-visual" src= "floating.png" width="600" height="480">
+        <rect x="100" y="14" width="60" height="34" rx="10" fill="#2196C9"/>
+        <rect x="107" y="48" width="46" height="14" rx="5" fill="#1A4B8C"/>
+        <defs>
+          <linearGradient id="bg2" x1="80" y1="60" x2="180" y2="408" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="rgba(210,240,255,0.9)"/><stop offset="100%" stop-color="rgba(140,200,240,0.65)"/></linearGradient>
+          <linearGradient id="wa2" x1="80" y1="60" x2="180" y2="170" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="rgba(58,155,213,0.5)"/><stop offset="100%" stop-color="rgba(26,75,140,0.7)"/></linearGradient>
+        </defs>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- DELIVERY -->
+<section class="section" id="delivery">
+  <div class="section-tag">How It Works</div>
+  <div class="section-title" id="del-title">Delivered to Your Door</div>
+  <p class="section-sub" id="del-sub">Ordering Noble Water is simple. We handle everything from production to delivery — absolutely free for local orders 5+ cases.</p>
+  <div class="delivery-grid">
+    <div class="delivery-card"><div class="d-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-8 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/></svg></div><div class="d-title" id="d1-title">1. Place Your Order</div><div class="d-body" id="d1-body">Call us, WhatsApp, or fill in the contact form below to place your order with product type and quantity.</div></div>
+    <div class="delivery-card"><div class="d-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div class="d-title" id="d2-title">2. We Pack & Dispatch</div><div class="d-body" id="d2-body">Your order is freshly bottled, sealed and dispatched same-day or in 2 days for local Maseru deliveries.</div></div>
+    <div class="delivery-card"><div class="d-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2C12 2 3 10 3 15.5A9 9 0 0 0 21 15.5C21 10 12 2 12 2Z"/><path d="M12 8v4l2 2"/></svg></div><div class="d-title" id="d3-title">3. Free Local Delivery</div><div class="d-body" id="d3-body">Delivery is completely free within the local area. Pure Noble Water arrives Fresh and ready to drink.</div></div>
+    <div class="delivery-card"><div class="d-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><div class="d-title" id="d4-title">Custom Brand Orders</div><div class="d-body" id="d4-body">Need custom-labeled bottles for your business or event? We handle design and printing — just ask.</div></div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+  <div>
+    <div class="section-tag" style="color:#5DCEF0">Contact Us</div>
+    <div class="section-title" id="contact-title">Order Noble Water Today</div>
+    <p class="section-sub" id="contact-sub">We'd love to hear from you. Fill in the form and we'll get back to you promptly via WhatsApp.</p>
+    <div style="margin-top:2rem;display:flex;flex-direction:column;gap:1rem">
+      <a href="tel:+26669434952" style="display: inline-flex; align-items: center; gap: 8px; color: #ffffff; text-decoration: none;">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+  </svg> +266 69434952
+</a>
+      <a href="https://wa.me/26656910125?text=Hi,%20I'm%20interested%20in%20Noble%20Water%20products" target="_blank" style="display: inline-flex; align-items: center; gap: 8px; color: #25D366; text-decoration: none;">
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg> WhatsApp Us
+</a>
+      <div style="display:flex;gap:.8rem;align-items:center;color:rgba(255,255,255,.75);font-size:.9rem">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <a href="mailto:noblewaterls@outlook.com?subject=Product Inquiry">noblewaterls@outlook.com</a>
+      </div>
+      <div style="display:flex;gap:.8rem;align-items:center;color:rgba(255,255,255,.75);font-size:.9rem">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span id="contact-address">Maseru, Lesotho</span>
+      </div>
+      </div> <img class="prod-icon" src="Lesotho flag.png" alt="Noble Water Bottle" width="60" height="40" style="float: left; margin-left: 50px;"></div>
+    </div>
+  </div>
+  <div class="contact-form">
+    <div class="form-row">
+      <div class="form-group"><label>First Name</label><input id="inp-first" type="text" placeholder="John"/></div>
+      <div class="form-group"><label>Last Name</label><input id="inp-last" type="text" placeholder="Doe"/></div>
+    </div>
+    <div class="form-group"><label>Phone / WhatsApp</label><input id="inp-phone" type="tel" placeholder="+266 5XXX XXXX"/></div>
+    <div class="form-group">
+      <label>Product</label>
+      <select id="inp-product">
+        <option>Water Sachets</option><option>350 ml Bottles</option>
+        <option>500 ml Bottles (most popular)</option><option>1.5 L Bottles</option>
+        <option>5 L Containers</option><option>10 L Containers</option>
+        <option>Custom Branded Water</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Message / Quantity</label><textarea id="inp-msg" placeholder="E.g. I need 2 crates of 500ml bottles delivered to..."></textarea></div>
+    <button class="submit-btn" onclick="sendToWhatsApp()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+      Send via WhatsApp
+    </button>
+  </div>
+  <section class="location">
+  <h2 style="color: white;">OUR OFFICE LOCATION</h2>
+
+<div class="map-container">
+  <iframe
+    src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d4208.308078941587!2d27.533064276335768!3d-29.312000897701022!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x1e8dcb2c03adb2b1%3A0x337b1a865686acfe!2sNOBLE%20WATER!5e1!3m2!1sen!2sls!4v1776952868637!5m2!1sen!2sls"
+    loading="lazy"
+    allowfullscreen=""
+    referrerpolicy="no-referrer-when-downgrade">
+  </iframe>
+</div>
+</section>
+</section>
+
+<footer>
+  <p>&copy; 2025 <strong id="footer-brand">Noble Water</strong> · Maseru, Lesotho · The Taste of Prestige</p>
+</footer>
+
+<script>
+const WHATSAPP_NUMBER='26656910125';
+let editMode=false;
+
+const editableIds=[
+  'brand-name','hero-badge','hero-tagline','hero-sub',
+  'stat1-num','stat1-lbl','stat2-num','stat2-lbl','stat3-num','stat3-lbl','stat4-num','stat4-lbl',
+  'ph1-num','ph1-lbl','ph2-num','ph2-lbl','ph3-num','ph3-lbl','ph4-num','ph4-lbl',
+  'prod-title','prod-sub',
+  'p0-vol','p0-name','p0-desc','p1-vol','p1-name','p1-desc',
+  'p2-vol','p2-name','p2-desc','p3-vol','p3-name','p3-desc',
+  'p4-vol','p4-name','p4-desc','p5-vol','p5-name','p5-desc',
+  'feat-title','feat-sub','f1-title','f1-body','f2-title','f2-body','f3-title','f3-body','f4-title','f4-body',
+  'del-title','del-sub','d1-title','d1-body','d2-title','d2-body','d3-title','d3-body','d4-title','d4-body',
+  'contact-title','contact-sub','contact-phone','contact-email','contact-address','footer-brand'
+];
+
+function toggleEditMode(){
+  editMode=true;
+  editableIds.forEach(id=>{const el=document.getElementById(id);if(el){el.contentEditable='true';el.setAttribute('spellcheck','false')}});
+  document.getElementById('edit-bar').classList.add('visible');
+  document.getElementById('edit-fab').style.display='none';
+}
+
+
+
+function sendToWhatsApp(){
+  const first=document.getElementById('inp-first').value.trim();
+  const last=document.getElementById('inp-last').value.trim();
+  const phone=document.getElementById('inp-phone').value.trim();
+  const product=document.getElementById('inp-product').value;
+  const msg=document.getElementById('inp-msg').value.trim();
+  if(!first&&!phone){alert('Please enter at least your name and phone number.');return}
+  const text=['👋 Hello Noble Water!','',`*Name:* ${first} ${last}`.trim(),phone?`*Phone:* ${phone}`:'',`*Product:* ${product}`,msg?`*Message:* ${msg}`:''].filter(Boolean).join('\n');
+  window.open('https://wa.me/'+WHATSAPP_NUMBER+'?text='+encodeURIComponent(text),'_blank');
+}
+
+document.getElementById('logo-file').addEventListener('change',function(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    const img=document.getElementById('nav-logo-img');
+    img.src=ev.target.result;img.style.display='block';
+    document.getElementById('nav-logo-svg').style.display='none';
+  };
+  reader.readAsDataURL(file);
+});
+</script>
+</body>
+</html>
