@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Checkout — Noble Water</title>
+<link rel="stylesheet" href="cart.css" />
+<style>
+  body {
+    margin: 0;
+    background: #f5f9fc;
+    color: #0a1628;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  .nw-checkout-wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+  }
+  .nw-checkout-wrap h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    margin-bottom: 0.25rem;
+    color: #0a1628;
+  }
+  p.nw-sub { color: #5a7080; margin-top: 0; margin-bottom: 2rem; }
+
+  #nw-order-summary {
+    background: #ffffff;
+    border: 1px solid rgba(10,22,40,0.1);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .nw-summary-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(10,22,40,0.08);
+    font-size: 0.95rem;
+  }
+  .nw-summary-row:last-child { border-bottom: none; }
+  .nw-summary-total {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(10,22,40,0.15);
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  .nw-section-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #5a7080;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 1.75rem 0 0.75rem;
+  }
+
+  form { display: flex; flex-direction: column; gap: 1rem; }
+  label { font-size: 0.9rem; color: #5a7080; }
+  input, textarea {
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 0.35rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid rgba(10,22,40,0.15);
+    background: #ffffff;
+    color: #0a1628;
+    font-size: 1rem;
+  }
+
+  /* payment method cards */
+  #nw-pay-methods {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+  }
+  .nw-pay-option {
+    border: 2px solid rgba(10,22,40,0.12);
+    border-radius: 10px;
+    padding: 0.9rem 0.75rem;
+    text-align: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #0a1628;
+    background: #ffffff;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .nw-pay-option.nw-selected {
+    border-color: #2FBF71;
+    background: rgba(47,191,113,0.08);
+  }
+
+  .nw-pay-details {
+    display: none;
+    background: #ffffff;
+    border: 1px solid rgba(10,22,40,0.1);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    margin-top: 1rem;
+  }
+  .nw-pay-details.nw-visible { display: block; }
+  .nw-pay-details h3 { margin: 0 0 0.75rem; font-size: 1rem; }
+  .nw-pay-details ol { margin: 0 0 1rem; padding-left: 1.2rem; }
+  .nw-pay-details li { margin-bottom: 0.4rem; font-size: 0.92rem; }
+  .nw-detail-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.4rem 0;
+    border-bottom: 1px solid rgba(10,22,40,0.08);
+    font-size: 0.9rem;
+  }
+  .nw-detail-row:last-child { border-bottom: none; }
+  .nw-detail-row strong { color: #0a1628; }
+
+  .nw-bank-choice {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .nw-bank-btn {
+    flex: 1;
+    padding: 0.6rem;
+    border: 1px solid rgba(10,22,40,0.15);
+    border-radius: 8px;
+    background: #f5f9fc;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+  .nw-bank-btn.nw-selected { border-color: #1A4B8C; background: rgba(26,75,140,0.08); color: #1A4B8C; }
+
+  button[type="submit"], .nw-confirm-btn {
+    margin-top: 0.5rem;
+    padding: 0.9rem;
+    border: none;
+    border-radius: 100px;
+    background: #2FBF71;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    text-align: center;
+  }
+  button[type="submit"]:disabled { opacity: 0.6; cursor: default; }
+</style>
+</head>
+<body>
+
+<div class="nw-checkout-wrap">
+  <h1>Checkout</h1>
+  <p class="nw-sub">Review your order, choose how you'd like to pay, and confirm.</p>
+
+  <div id="nw-order-summary"></div>
+
+  <form id="nw-checkout-form">
+    <div>
+      <label for="nw-name">Full name</label>
+      <input id="nw-name" name="name" type="text" required />
+    </div>
+    <div>
+      <label for="nw-phone">Phone number</label>
+      <input id="nw-phone" name="phone" type="tel" placeholder="e.g. 5xxxxxxx" required />
+    </div>
+    <div>
+      <label for="nw-address">Delivery address</label>
+      <textarea id="nw-address" name="address" rows="3" required></textarea>
+    </div>
+
+    <div class="nw-section-label">How would you like to pay?</div>
+    <div id="nw-pay-methods">
+      <div class="nw-pay-option" data-method="whatsapp">Order via WhatsApp</div>
+      <div class="nw-pay-option" data-method="mpesa">M-Pesa</div>
+      <div class="nw-pay-option" data-method="ecocash">EcoCash</div>
+      <div class="nw-pay-option" data-method="bank">Bank Transfer</div>
+    </div>
+
+    <!-- WhatsApp: no extra details, just informs the customer what happens -->
+    <div class="nw-pay-details" data-details="whatsapp">
+      <p>We'll open WhatsApp with your order details filled in. Just hit send and we'll confirm pricing and delivery with you there.</p>
+    </div>
+
+    <!-- M-Pesa merchant payment instructions -->
+    <div class="nw-pay-details" data-details="mpesa">
+      <h3>Pay via M-Pesa</h3>
+      <ol>
+        <li>Dial <strong>*200#</strong> on your M-Pesa registered number</li>
+        <li>Select <strong>Pay Merchant</strong></li>
+        <li>Enter merchant number <strong>91093</strong> (PM Legacy Group)</li>
+        <li>Enter the amount: <strong id="nw-mpesa-amount">M0.00</strong></li>
+        <li>Enter Reference: <strong id="nw-mpesa-reference">XXXXXX</strong></li>
+        <li>Confirm with your M-Pesa PIN</li>
+      </ol>
+      <p>Once you've paid, tap the button below — we'll get your order details and payment confirmation together on WhatsApp.</p>
+    </div>
+
+    <!-- EcoCash merchant payment instructions -->
+    <div class="nw-pay-details" data-details="ecocash">
+      <h3>Pay via EcoCash</h3>
+      <ol>
+        <li>Dial <strong>*199#</strong> on your Econet number and select EcoCash</li>
+        <li>Select <strong>Send Money</strong></li>
+        <li>Enter number <strong>69434952</strong> (Poea Mapiloko)</li>
+        <li>Enter the amount: <strong id="nw-ecocash-amount">M0.00</strong></li>
+        <li>Confirm with your EcoCash PIN</li>
+      </ol>
+      <p>Once you've paid, tap the button below to confirm your order with us on WhatsApp.</p>
+    </div>
+
+    <!-- Bank transfer details -->
+    <div class="nw-pay-details" data-details="bank">
+      <h3>Pay via Bank Transfer</h3>
+      <div class="nw-bank-choice">
+        <button type="button" class="nw-bank-btn nw-selected" data-bank="fnb">FNB Lesotho</button>
+        <button type="button" class="nw-bank-btn" data-bank="postbank">Lesotho Post Bank</button>
+      </div>
+
+      <div id="nw-bank-fnb">
+        <div class="nw-detail-row"><span>Account name</span><strong>Poea Mapiloko</strong></div>
+        <div class="nw-detail-row"><span>Account number</span><strong>62738022037</strong></div>
+        <div class="nw-detail-row"><span>Bank</span><strong>FNB Lesotho</strong></div>
+        <div class="nw-detail-row"><span>Branch</span><strong>Kingsway C/O Kingsway Road &amp; Parliament</strong></div>
+        <div class="nw-detail-row"><span>Branch code</span><strong>280061</strong></div>
+      </div>
+      <div id="nw-bank-postbank" style="display:none;">
+        <div class="nw-detail-row"><span>Account name</span><strong>PM Legacy Group</strong></div>
+        <div class="nw-detail-row"><span>Account number</span><strong>1039175400019</strong></div>
+        <div class="nw-detail-row"><span>Bank</span><strong>Lesotho Post Bank</strong></div>
+        <div class="nw-detail-row"><span>Branch</span><strong>Mapoteng Branch</strong></div>
+        <div class="nw-detail-row"><span>Branch code</span><strong>500 250</strong></div>
+      </div>
+      <p style="margin-top:1rem;">Amount to transfer: <strong id="nw-bank-amount">M0.00</strong></p>
+      <p>Once you've made the transfer, tap the button below — send us your order and we'll confirm once the payment reflects.</p>
+    </div>
+
+    <button type="submit" id="nw-submit-btn" disabled>Select a payment method</button>
+  </form>
+</div>
+
+<script src="cart.js" defer></script>
+<script>
+  const WHATSAPP_NUMBER = '26656910125';
+  let orderData = null;
+  let selectedMethod = null;
+  let selectedBank = 'fnb';
+
+  function renderSummary() {
+    const cart = (window.NobleCart && window.NobleCart.load()) || [];
+    const summaryEl = document.getElementById('nw-order-summary');
+    if (cart.length === 0) {
+      summaryEl.innerHTML = '<p>Your cart is empty. <a href="index.html" style="color:#2FBF71">Go back to shop</a>.</p>';
+      document.getElementById('nw-submit-btn').disabled = true;
+      return null;
+    }
+    let total = 0;
+    const rows = cart.map((item) => {
+      const lineTotal = item.price * item.qty;
+      total += lineTotal;
+      return `<div class="nw-summary-row"><span>${item.name} × ${item.qty}</span><span>M${lineTotal.toFixed(2)}</span></div>`;
+    }).join('');
+    summaryEl.innerHTML = rows + `<div class="nw-summary-total"><span>Total</span><span>M${total.toFixed(2)}</span></div>`;
+
+    document.getElementById('nw-mpesa-amount').textContent = `M${total.toFixed(2)}`;
+    document.getElementById('nw-ecocash-amount').textContent = `M${total.toFixed(2)}`;
+    document.getElementById('nw-bank-amount').textContent = `M${total.toFixed(2)}`;
+
+    return { cart, total };
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    orderData = renderSummary();
+
+    document.querySelectorAll('.nw-pay-option').forEach((opt) => {
+      opt.addEventListener('click', () => {
+        document.querySelectorAll('.nw-pay-option').forEach((o) => o.classList.remove('nw-selected'));
+        document.querySelectorAll('.nw-pay-details').forEach((d) => d.classList.remove('nw-visible'));
+        opt.classList.add('nw-selected');
+        selectedMethod = opt.dataset.method;
+        document.querySelector(`.nw-pay-details[data-details="${selectedMethod}"]`).classList.add('nw-visible');
+
+        const submitBtn = document.getElementById('nw-submit-btn');
+        submitBtn.disabled = false;
+        submitBtn.textContent = selectedMethod === 'whatsapp' ? 'Continue on WhatsApp' : "I've Paid — Confirm Order";
+      });
+    });
+
+    document.querySelectorAll('.nw-bank-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.nw-bank-btn').forEach((b) => b.classList.remove('nw-selected'));
+        btn.classList.add('nw-selected');
+        selectedBank = btn.dataset.bank;
+        document.getElementById('nw-bank-fnb').style.display = selectedBank === 'fnb' ? 'block' : 'none';
+        document.getElementById('nw-bank-postbank').style.display = selectedBank === 'postbank' ? 'block' : 'none';
+      });
+    });
+  });
+
+  document.getElementById('nw-checkout-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!orderData || !selectedMethod) return;
+
+    const name = document.getElementById('nw-name').value;
+    const phone = document.getElementById('nw-phone').value;
+    const address = document.getElementById('nw-address').value;
+
+    const itemLines = orderData.cart
+      .map((item) => `- ${item.name} × ${item.qty} (M${(item.price * item.qty).toFixed(2)})`)
+      .join('\n');
+
+    let paymentLine = '';
+    if (selectedMethod === 'mpesa') paymentLine = 'Payment method: M-Pesa (paid to merchant 91093)';
+    else if (selectedMethod === 'ecocash') paymentLine = 'Payment method: EcoCash (paid to merchant 69434952)';
+    else if (selectedMethod === 'bank') {
+      const bankName = selectedBank === 'fnb' ? 'FNB Lesotho' : 'Lesotho Post Bank';
+      paymentLine = `Payment method: Bank Transfer (${bankName})`;
+    } else {
+      paymentLine = 'Payment method: To be arranged via WhatsApp';
+    }
+
+    const message = [
+      '👋 Hello Noble Water! I would like to place an order.',
+      '',
+      `*Name:* ${name}`,
+      `*Phone:* ${phone}`,
+      `*Delivery address:* ${address}`,
+      '',
+      '*Order:*',
+      itemLines,
+      `*Total:* M${orderData.total.toFixed(2)}`,
+      '',
+      paymentLine,
+    ].join('\n');
+
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
+    localStorage.removeItem('nw_cart_v1');
+  });
+</script>
+</body>
+</html>
